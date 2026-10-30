@@ -1,6 +1,9 @@
 import { isNil, trimStart } from "lodash";
-import React from "react";
-import { Section, Switch, TextArea } from "@/components/visualizations/editor";
+import React, { useState } from "react";
+
+import Editor from "@monaco-editor/react";
+
+import { Section, Switch } from "@/components/visualizations/editor";
 import { EditorPropTypes } from "@/visualizations/prop-types";
 
 const defaultCustomCode = trimStart(`
@@ -11,17 +14,57 @@ const defaultCustomCode = trimStart(`
 `);
 
 export default function CustomChartSettings({ options, onOptionsChange }: any) {
+  const [expanded, setExpanded] = useState(false);
+  const [errors, setErrors] = useState<any[]>([]);
+
   return (
     <React.Fragment>
       {/* @ts-expect-error ts-migrate(2745) FIXME: This JSX tag's 'children' prop expects type 'never... Remove this comment to see the full error message */}
       <Section>
-        <TextArea
-          label="Custom code"
-          data-test="Chart.Custom.Code"
-          rows="10"
-          defaultValue={isNil(options.customCode) ? defaultCustomCode : options.customCode}
-          onChange={(event: any) => onOptionsChange({ customCode: event.target.value })}
+       <div style={{ width: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+          <span>Custom code</span>
+
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? "Minimize" : "Expand"}
+          </button>
+        </div>
+
+        <Editor
+          height={expanded ? "80vh" : "300px"}
+          defaultLanguage="javascript"
+          theme="vs-dark"
+          value={isNil(options.customCode) ? defaultCustomCode : options.customCode}
+          onChange={(value) => onOptionsChange({ customCode: value ?? "" })}
+          onValidate={(markers) => setErrors(markers)}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on",
+            automaticLayout: true,
+            tabSize: 2,
+            wordWrap: "on",
+            scrollBeyondLastLine: false,
+            folding: true,
+            scrollbar: {
+              alwaysConsumeMouseWheel: true,
+            },
+          }}
         />
+
+        <div style={{ marginTop: 8 }}>
+          <strong>Problems ({errors.length})</strong>
+
+          {errors.map((error, index) => (
+            <div key={index} style={{ color: "red", fontSize: 12 }}>
+              Line {error.startLineNumber}: {error.message}
+            </div>
+          ))}
+        </div>
+      </div>
       </Section>
 
       {/* @ts-expect-error ts-migrate(2745) FIXME: This JSX tag's 'children' prop expects type 'never... Remove this comment to see the full error message */}

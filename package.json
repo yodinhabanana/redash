@@ -4,7 +4,7 @@
   "description": "The frontend part of Redash.",
   "main": "index.js",
   "scripts": {
-    "start": "npm-run-all --parallel watch:viz webpack-dev-server",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider npm-run-all --parallel watch:viz webpack-dev-server",
     "clean": "rm -rf ./client/dist/",
     "build:viz": "(cd viz-lib && yarn build:babel)",
     "build": "yarn clean && yarn build:viz && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production webpack",
@@ -45,6 +45,7 @@
   "homepage": "https://redash.io/",
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
+    "@monaco-editor/react": "4.4.6",
     "@redash/viz": "file:viz-lib",
     "ace-builds": "^1.4.12",
     "antd": "^4.4.3",
